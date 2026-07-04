@@ -1,0 +1,226 @@
+{
+  "info": {
+    "_postman_id": "4d5f5b4a-1a2b-3c4d-5e6f-7a8b9c0d1e2f",
+    "name": "Signzy Vendor Routing Platform",
+    "description": "Collection of all APIs for the Intelligent Vendor Routing Platform assignment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Checks the overall health of the system."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Register a Vendor",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"VendorX\",\n  \"capability\": \"PAN_VERIFICATION\",\n  \"costPerRequest\": 1.75,\n  \"timeoutMs\": 2200,\n  \"rateLimitPerMinute\": 150,\n  \"priority\": 2,\n  \"weight\": 50,\n  \"supportedFeatures\": [\"name_match\", \"dob_match\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/vendors",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "vendors"
+          ]
+        },
+        "description": "Registers a new vendor or updates an existing one if the name and capability match."
+      },
+      "response": []
+    },
+    {
+      "name": "3. List All Vendors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/vendors",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "vendors"
+          ]
+        },
+        "description": "Lists all vendors currently registered in the system."
+      },
+      "response": []
+    },
+    {
+      "name": "4. List Vendors (Filtered)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/vendors?capability=PAN_VERIFICATION",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "vendors"
+          ],
+          "query": [
+            {
+              "key": "capability",
+              "value": "PAN_VERIFICATION"
+            }
+          ]
+        },
+        "description": "Lists vendors filtered by a specific capability."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Set Routing Config",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"capability\": \"PAN_VERIFICATION\",\n  \"strategy\": \"lowest-latency\",\n  \"latencyThresholdMs\": 2000,\n  \"errorRateThreshold\": 50\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/routing-config",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "routing-config"
+          ]
+        },
+        "description": "Updates the routing strategy for a specific capability. Try changing strategy to: 'priority', 'weighted', 'lowest-latency', 'lowest-cost', or 'round-robin'."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Get Routing Configs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/routing-config",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "routing-config"
+          ]
+        },
+        "description": "Gets all routing configs."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Route Request (Main Endpoint)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"capability\": \"PAN_VERIFICATION\",\n  \"payload\": {\n    \"pan_number\": \"ABCDE1234F\",\n    \"name\": \"Jane Doe\"\n  },\n  \"requiredFeatures\": [\"name_match\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/route",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "route"
+          ]
+        },
+        "description": "The main endpoint where the client asks the system to route a request to the best vendor."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Get All Vendor Metrics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/vendor-metrics",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "vendor-metrics"
+          ]
+        },
+        "description": "Shows success rates, latencies, and health status for all vendors."
+      },
+      "response": []
+    },
+    {
+      "name": "9. Get Routing Logs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/routing-logs",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "routing-logs"
+          ]
+        },
+        "description": "Shows the history of routing decisions and failover chains."
+      },
+      "response": []
+    }
+  ]
+}

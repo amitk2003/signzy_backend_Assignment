@@ -1,0 +1,57 @@
+[
+    {
+        "id": "v1",
+        "name": "VendorA",
+        "capability": "PAN_VERIFICATION",
+        "costPerRequest": 1.5,
+        "timeoutMs": 2000,
+        "rateLimitPerMinute": 100,
+        "priority": 1,
+        "weight": 70,
+        "supportedFeatures": ["name_match", "dob_match", "photo_match"]
+    },
+    {
+        "id": "v2",
+        "name": "VendorB",
+        "capability": "PAN_VERIFICATION",
+        "costPerRequest": 1.2,
+        "timeoutMs": 3000,
+        "rateLimitPerMinute": 50,
+        "priority": 2,
+        "weight": 30,
+        "supportedFeatures": ["name_match", "dob_match"]
+    },
+    {
+        "id": "v3",
+        "name": "VendorC",
+        "capability": "PAN_VERIFICATION",
+        "costPerRequest": 2.0,
+        "timeoutMs": 1500,
+        "rateLimitPerMinute": 200,
+        "priority": 3,
+        "weight": 10,
+        "supportedFeatures": ["name_match", "dob_match", "photo_match", "address_match"]
+    },
+    {
+        "id": "v4",
+        "name": "VendorD",
+        "capability": "AADHAAR_VERIFICATION",
+        "costPerRequest": 2.5,
+        "timeoutMs": 2500,
+        "rateLimitPerMinute": 80,
+        "priority": 1,
+        "weight": 60,
+        "supportedFeatures": ["otp_verify", "demographic_match"]
+    },
+    {
+        "id": "v5",
+        "name": "VendorE",
+        "capability": "AADHAAR_VERIFICATION",
+        "costPerRequest": 1.8,
+        "timeoutMs": 3000,
+        "rateLimitPerMinute": 120,
+        "priority": 2,
+        "weight": 40,
+        "supportedFeatures": ["otp_verify"]
+    }
+]

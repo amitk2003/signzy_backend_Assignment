@@ -1,0 +1,110 @@
+INTELLIGENT VENDOR ROUTING PLATFORM — IMPLEMENTATION PLAN
+==========================================================
+
+PROBLEM SUMMARY
+---------------
+Build a backend system that acts as a smart middleman between clients and 
+multiple third-party vendors. The system picks the best vendor for each request 
+based on routing rules, tracks how vendors are performing, and switches vendors 
+automatically when something goes wrong.
+
+Example flow: Client -> /route (PAN_VERIFICATION) -> System picks VendorA -> Gets response -> Returns standardized response
+
+The client never knows which vendor handled the request.
+
+
+TECH STACK
+----------
+- Runtime:    Node.js
+- Framework:  Express.js
+- Database:   In-memory (Maps/Arrays) — no external DB needed
+- Language:   JavaScript (ES6)
+
+
+FILE STRUCTURE
+--------------
+Signzy_assignment/
+├── server.js                          # Entry point
+├── package.json
+├── README.md
+├── AI_USAGE.md
+├── ARCHITECTURE.md
+├── configs/
+│   ├── sample-routing-config.json     # Pre-loaded routing rules
+│   └── sample-vendors.json            # Pre-loaded vendor data
+├── samples/
+│   └── api-examples.md               # curl commands + responses
+├── src/
+│   ├── routes/
+│   │   ├── vendorRoutes.js            # POST/GET /vendors
+│   │   ├── routingRoutes.js           # POST /route, GET /routing-logs, /metrics, /health
+│   │   └── configRoutes.js            # POST/GET /routing-config
+│   ├── strategies/
+│   │   ├── strategyRouter.js          # Strategy factory
+│   │   ├── priorityStrategy.js
+│   │   ├── weightedStrategy.js
+│   │   ├── lowestLatencyStrategy.js
+│   │   ├── lowestCostStrategy.js
+│   │   └── roundRobinStrategy.js
+│   ├── services/
+│   │   ├── vendorCaller.js            # Simulates vendor API calls
+│   │   ├── metricsTracker.js          # Tracks vendor performance
+│   │   ├── rateLimiter.js             # Per-vendor rate limiting
+│   │   └── failoverHandler.js         # Automatic failover logic
+│   └── store/
+│       └── dataStore.js               # In-memory data storage
+└── test/
+    └── smoke-test.js                  # Quick endpoint validation
+
+
+ROUTING STRATEGIES (5 out of 8)
+-------------------------------
+1. Priority-based   — Picks vendor with lowest priority number (highest priority)
+2. Weighted          — Distributes traffic based on weight % (e.g., 70/30)
+3. Lowest Latency    — Picks vendor with lowest average response time
+4. Lowest Cost       — Picks vendor with cheapest cost per request
+5. Round Robin       — Cycles through vendors in order
+
+
+FAILOVER LOGIC
+--------------
+When primary vendor fails, system automatically tries next vendor.
+Reasons for skipping a vendor:
+  - Vendor is marked unhealthy (high error rate or latency)
+  - Rate limit exceeded
+  - Vendor doesn't support required feature
+  - Vendor call timed out or errored
+
+Each skip reason is logged in routing decision logs.
+
+
+EDGE CASES HANDLED
+------------------
+- No vendors registered for a capability -> clear error
+- All vendors down -> error after exhausting all options
+- Rate limit exceeded on all vendors -> error with retry hint
+- Invalid strategy name -> falls back to priority-based
+- Missing required fields -> validation errors
+- Vendor registered twice -> updates existing
+- Metrics for zero calls -> returns zeros (not NaN)
+
+
+MANDATORY APIs
+--------------
+POST /vendors           — Register a new vendor
+GET  /vendors           — List all vendors
+POST /route             — Route a request to best vendor
+GET  /vendor-metrics    — Get vendor performance metrics
+GET  /routing-logs      — Get routing decision history
+GET  /health            — Health check
+
+
+VERIFICATION
+------------
+1. Start server, hit GET /health
+2. Register 3 vendors via POST /vendors
+3. Set routing config via POST /routing-config
+4. Send multiple POST /route requests
+5. Check GET /vendor-metrics for updated stats
+6. Check GET /routing-logs for decision history
+7. Run smoke test script

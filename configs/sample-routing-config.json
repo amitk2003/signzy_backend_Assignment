@@ -1,0 +1,44 @@
+[
+    {
+        "capability": "PAN_VERIFICATION",
+        "strategy": "weighted",
+        "latencyThresholdMs": 2000,
+        "errorRateThreshold": 50,
+        "vendors": [
+            {
+                "name": "VendorA",
+                "weight": 70,
+                "costPerRequest": 1.5,
+                "timeoutMs": 2000,
+                "rateLimitPerMinute": 100,
+                "priority": 1
+            },
+            {
+                "name": "VendorB",
+                "weight": 30,
+                "costPerRequest": 1.2,
+                "timeoutMs": 3000,
+                "rateLimitPerMinute": 50,
+                "priority": 2
+            }
+        ]
+    },
+    {
+        "capability": "AADHAAR_VERIFICATION",
+        "strategy": "priority",
+        "latencyThresholdMs": 2500,
+        "errorRateThreshold": 40,
+        "vendors": [
+            {
+                "name": "VendorD",
+                "weight": 60,
+                "priority": 1
+            },
+            {
+                "name": "VendorE",
+                "weight": 40,
+                "priority": 2
+            }
+        ]
+    }
+]
