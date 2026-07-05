@@ -1,15 +1,20 @@
 # Intelligent Vendor Routing Platform
 
+*Note: For a detailed technical write-up, architectural decisions, and feature explanations, please see the [Project Report](assignment_report.md).*
+
 A smart backend system that acts as an intelligent middleman between clients and multiple third-party vendors. It routes requests to the best available vendor based on configurable rules, tracks performance metrics, and automatically handles failovers when things go wrong.
 
 ## 🚀 Features
 
-- **5 Routing Strategies**: 
-  - Priority-based
-  - Weighted (e.g., 70/30 split)
+- **8 Routing Strategies**: 
+  - Priority-based (picks highest priority)
+  - Weighted (distributes traffic based on weight %)
   - Lowest Latency (picks the fastest vendor)
   - Lowest Cost (picks the cheapest vendor)
   - Round-Robin (distributes evenly)
+  - Failover (explicit fallback sequence based on priority)
+  - Feature-based (picks vendor supporting the highest number of features)
+  - Health-based (picks vendor with the highest success rate)
 - **Automatic Failover**: If a vendor times out, errors out, or rate-limits you, the system automatically tries the next best vendor.
 - **Health Tracking**: Vendors are marked as unhealthy if their error rate exceeds 50% or they have 5 consecutive failures.
 - **Rate Limiting**: Per-vendor rate limits (sliding window) prevent you from exceeding your quotas.
@@ -37,6 +42,8 @@ The server will start on `http://localhost:3000`.
 *Note: Sample vendors and routing configurations are automatically loaded on startup!*
 
 ## 📖 API Documentation
+
+Complete OpenAPI 3.0 documentation is available in the `swagger.yaml` file located in the root directory. You can use it with Swagger UI or Postman to view detailed endpoint schemas.
 
 ### 1. Register a Vendor
 Add a new vendor or update an existing one.
@@ -106,7 +113,7 @@ Change how the system picks vendors for a capability.
 ### 4. System Observability
 - **GET `/vendors`**: List all registered vendors
 - **GET `/vendor-metrics`**: See success/error rates, avg latency, and health status for all vendors
-- **GET `/routing-logs`**: See the history of routing decisions, failovers, and reasons for skipping vendors
+- **GET `/routing-logs`**: See the history of routing decisions, failovers, and reasons for skipping vendors. (Supports query filtering: `?capability=`, `?vendor=`, `?status=`)
 - **GET `/health`**: Check overall system health
 
 ## 🧪 Testing

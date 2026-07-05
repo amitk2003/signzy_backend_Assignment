@@ -13,6 +13,9 @@ from src.strategies import weighted_strategy
 from src.strategies import lowest_latency_strategy
 from src.strategies import lowest_cost_strategy
 from src.strategies import round_robin_strategy
+from src.strategies import health_based_strategy
+from src.strategies import feature_based_strategy
+from src.strategies import failover_strategy
 
 
 # map of strategy names to their modules
@@ -25,6 +28,11 @@ STRATEGY_MAP = {
     "lowest_cost": lowest_cost_strategy,
     "round-robin": round_robin_strategy,
     "round_robin": round_robin_strategy,
+    "health-based": health_based_strategy,
+    "health_based": health_based_strategy,
+    "feature-based": feature_based_strategy,
+    "feature_based": feature_based_strategy,
+    "failover": failover_strategy,
 }
 
 # default strategy if none specified or if an invalid one is given

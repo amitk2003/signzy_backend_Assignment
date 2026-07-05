@@ -1,0 +1,289 @@
+openapi: 3.0.0
+info:
+  title: Intelligent Vendor Routing Platform
+  description: API documentation for the intelligent vendor routing and failover system.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      summary: System health check
+      description: Returns the overall health status of the system and a summary of vendors.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                  summary:
+                    type: object
+                    properties:
+                      total_vendors:
+                        type: integer
+                      healthy_vendors:
+                        type: integer
+                      unhealthy_vendors:
+                        type: integer
+                      total_routing_configs:
+                        type: integer
+
+  /vendors:
+    get:
+      summary: List vendors
+      description: Returns a list of all registered vendors. Optionally filter by capability.
+      parameters:
+        - in: query
+          name: capability
+          schema:
+            type: string
+          required: false
+          description: Filter vendors by capability (e.g., PAN_VERIFICATION)
+      responses:
+        '200':
+          description: A list of vendors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  vendors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vendor'
+
+    post:
+      summary: Register a vendor
+      description: Registers a new vendor or updates an existing one if the name and capability match.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorInput'
+      responses:
+        '201':
+          description: Vendor registered successfully
+        '400':
+          description: Validation error
+
+  /routing-config:
+    get:
+      summary: Get routing configs
+      description: Returns all routing configurations. Optionally filter by capability.
+      parameters:
+        - in: query
+          name: capability
+          schema:
+            type: string
+          required: false
+          description: Filter config by capability
+      responses:
+        '200':
+          description: Routing configurations
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      summary: Set routing config
+      description: Updates the routing strategy for a specific capability.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - capability
+                - strategy
+              properties:
+                capability:
+                  type: string
+                  example: PAN_VERIFICATION
+                strategy:
+                  type: string
+                  example: lowest-latency
+                latencyThresholdMs:
+                  type: integer
+                  example: 1500
+      responses:
+        '200':
+          description: Config updated successfully
+
+  /route:
+    post:
+      summary: Route request
+      description: Main endpoint. Routes the client request to the best vendor based on configured routing strategies and failover logic.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - capability
+              properties:
+                capability:
+                  type: string
+                  example: PAN_VERIFICATION
+                payload:
+                  type: object
+                  example: {"pan_number": "ABCDE1234F"}
+                requiredFeatures:
+                  type: array
+                  items:
+                    type: string
+                  example: ["name_match"]
+      responses:
+        '200':
+          description: Request successfully routed and processed by a vendor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteResponse'
+        '503':
+          description: All vendors failed or are unavailable
+
+  /vendor-metrics:
+    get:
+      summary: Get vendor metrics
+      description: Retrieves performance metrics (success rate, latency, health) for all vendors or a specific vendor.
+      parameters:
+        - in: query
+          name: vendor
+          schema:
+            type: string
+          required: false
+          description: Specific vendor name
+      responses:
+        '200':
+          description: Vendor metrics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /routing-logs:
+    get:
+      summary: Get routing logs
+      description: Retrieves the history of routing decisions, failovers, and skip reasons.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: Number of logs to return
+        - in: query
+          name: capability
+          schema:
+            type: string
+          description: Filter logs by capability
+        - in: query
+          name: vendor
+          schema:
+            type: string
+          description: Filter logs by vendor used
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [SUCCESS, FAILED]
+          description: Filter logs by routing status
+      responses:
+        '200':
+          description: Routing logs
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  schemas:
+    VendorInput:
+      type: object
+      required:
+        - name
+        - capability
+      properties:
+        name:
+          type: string
+          example: VendorA
+        capability:
+          type: string
+          example: PAN_VERIFICATION
+        costPerRequest:
+          type: number
+          example: 1.5
+        timeoutMs:
+          type: integer
+          example: 2000
+        rateLimitPerMinute:
+          type: integer
+          example: 100
+        priority:
+          type: integer
+          example: 1
+        weight:
+          type: integer
+          example: 70
+        supportedFeatures:
+          type: array
+          items:
+            type: string
+          example: ["name_match"]
+          
+    Vendor:
+      allOf:
+        - $ref: '#/components/schemas/VendorInput'
+        - type: object
+          properties:
+            id:
+              type: string
+              
+    RouteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        error:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          properties:
+            request_id:
+              type: string
+            capability:
+              type: string
+            vendor_used:
+              type: string
+            strategy:
+              type: string
+            latency_ms:
+              type: integer
+            skipped_vendors:
+              type: array
+              items:
+                type: object
+            failover_chain:
+              type: array
+              items:
+                type: object
+            timestamp:
+              type: string

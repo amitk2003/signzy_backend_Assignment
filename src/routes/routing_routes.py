@@ -110,6 +110,9 @@ def get_routing_logs():
     Use ?limit=N to control how many logs to return (default: 50).
     """
     limit = request.args.get("limit", 50)
+    capability = request.args.get("capability")
+    vendor = request.args.get("vendor")
+    status = request.args.get("status")
 
     try:
         limit = int(limit)
@@ -120,7 +123,12 @@ def get_routing_logs():
     except (ValueError, TypeError):
         limit = 50
 
-    logs = store.get_routing_logs(limit)
+    logs = store.get_routing_logs(
+        limit=limit, 
+        capability=capability, 
+        vendor=vendor, 
+        status=status
+    )
 
     return jsonify({
         "count": len(logs),

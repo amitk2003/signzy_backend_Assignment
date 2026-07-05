@@ -238,10 +238,19 @@ class DataStore:
             if len(self.routing_logs) > 500:
                 self.routing_logs = self.routing_logs[-500:]
 
-    def get_routing_logs(self, limit=50):
-        """Get recent routing logs."""
+    def get_routing_logs(self, limit=50, capability=None, vendor=None, status=None):
+        """Get recent routing logs with optional filtering."""
         with self._lock:
-            return list(reversed(self.routing_logs[-limit:]))
+            logs = self.routing_logs
+            if capability:
+                capability = capability.upper()
+                logs = [log for log in logs if log.get("capability") == capability]
+            if vendor:
+                logs = [log for log in logs if log.get("vendor_used") == vendor]
+            if status:
+                logs = [log for log in logs if log.get("status") == status]
+                
+            return list(reversed(logs[-limit:] if limit else logs))
 
     # ---- Round robin ----
 
