@@ -18,6 +18,9 @@ graph TD
     SR --> L[Latency Strategy]
     SR --> C[Cost Strategy]
     SR --> R[Round Robin Strategy]
+    SR --> H[Health Based Strategy]
+    SR --> F[Feature Based Strategy]
+    SR --> FO[Failover Strategy]
     
     FH --> VC[Vendor Caller Simulator]
     
@@ -52,13 +55,16 @@ Before applying any strategy, it filters the list of available vendors based on 
 - **Latency Threshold**: The routing config specified a max latency, and the vendor's average latency exceeds it.
 
 ### 3. Strategy Selection (The Picking Phase)
-The remaining vendors are passed to the configured routing strategy. We support 5 strategies:
+The remaining vendors are passed to the configured routing strategy. We support 8 strategies:
 
 1. **Priority**: Sorts vendors by priority number. Picks the lowest number (e.g., Priority 1 > Priority 2).
 2. **Weighted**: Uses cumulative probabilities. If Vendor A has weight 70 and Vendor B has 30, it generates a random number to ensure A gets ~70% of traffic.
 3. **Lowest Latency**: Checks the metrics tracker. Picks the vendor with the lowest `avg_latency_ms`. (New vendors get a free pass of 0ms to build stats).
 4. **Lowest Cost**: Simple sort by `costPerRequest`.
 5. **Round Robin**: Uses a counter in the data store to cycle through available vendors sequentially.
+6. **Health-Based**: Picks the vendor with the highest historical success rate.
+7. **Feature-Based**: Picks the vendor supporting the highest absolute number of features.
+8. **Failover**: Explicitly relies on the strict priority chain to act solely as a cascading fallback sequence.
 
 ### 4. Execution & Failover
 The selected vendor is called. 
